@@ -108,7 +108,11 @@ module.exports = {
     '@typescript-eslint/prefer-for-of': 'error',
     '@typescript-eslint/prefer-function-type': 'error',
     '@typescript-eslint/prefer-namespace-keyword': 'error',
-    '@typescript-eslint/quotes': ['error', 'single'],
+    '@typescript-eslint/quotes': [
+      'error',
+      'single',
+      { avoidEscape: true, allowTemplateLiterals: true }
+    ],
     '@typescript-eslint/semi': ['off', null],
     '@typescript-eslint/triple-slash-reference': [
       'error',
@@ -121,6 +125,8 @@ module.exports = {
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/unified-signatures': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/require-await': 'off',
+    '@typescript-eslint/restrict-template-expressions': 'off',
     'arrow-parens': ['off', 'always'],
     'brace-style': ['off', 'off'],
     camelcase: 'error',

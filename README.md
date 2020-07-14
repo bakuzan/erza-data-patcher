@@ -1,6 +1,8 @@
-# Erza Tag Populater
+# Erza Data Patcher
 
-Utility to query series in [Erza](https://github.com/bakuzan/erza) and perform bulk operations against tags.
+Utility to patch missing series data in [Erza](https://github.com/bakuzan/erza).
+
+The initial goal is to patch malId, series_start, series_type, and the cover image.
 
 ## Usage
 

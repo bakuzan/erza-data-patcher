@@ -3,5 +3,6 @@ node_modules
 
 # Files
 .env
+*.sqlite
 **/cache/*.{html,json}
 **/output/*.{html,json}
