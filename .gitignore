@@ -4,5 +4,9 @@ node_modules
 # Files
 .env
 *.sqlite
-**/cache/*.{html,json}
-**/output/*.{html,json}
+
+# Temp files
+**/cache/*.html
+**/cache/*.json
+**/output/*.html
+**/output/*.json

@@ -6,6 +6,7 @@ import { SeriesType } from '@/enums/SeriesType';
 import { log } from '@/utils/log';
 
 import loadSeriesWithMissingId from './processing/loadSeriesWithMissingId';
+import updateIds from './processing/updateIds';
 
 dotenv.config();
 
@@ -31,6 +32,10 @@ async function start() {
       description: `Series type to use. Options: 'anime' or 'manga'`,
       validate: (_: any, value: string) => value in SeriesType,
       required: true
+    })
+    .addOption({
+      option: 'save',
+      description: `Persist changes to database. (Without this flag actions are dry-run.)`
     })
     .parse(process.argv)
     .welcome();
@@ -59,10 +64,12 @@ async function start() {
   );
 
   switch (cli.get('mode')) {
-    case Mode.missingId:
+    case Mode.missingId: {
       await loadSeriesWithMissingId(cli.get('type'));
-      // do stuff with loaded values...
+      await updateIds(cli.get('type'), cli.has('save'));
       break;
+    }
+
     default:
       log(`Mode case '${cli.get('mode')}' is not handled.`);
       break;

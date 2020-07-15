@@ -127,6 +127,8 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/require-await': 'off',
     '@typescript-eslint/restrict-template-expressions': 'off',
+    '@typescript-eslint/no-unsafe-assignment': ['warn'],
+    '@typescript-eslint/no-unsafe-member-access': ['warn'],
     'arrow-parens': ['off', 'always'],
     'brace-style': ['off', 'off'],
     camelcase: 'error',
