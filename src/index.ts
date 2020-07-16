@@ -6,7 +6,9 @@ import { SeriesType } from '@/enums/SeriesType';
 import { log } from '@/utils/log';
 
 import loadSeriesWithMissingId from './processing/loadSeriesWithMissingId';
+import loadSeriesWithMissingData from './processing/loadSeriesWithMissingData';
 import updateIds from './processing/updateIds';
+import updateData from './processing/updateData';
 
 dotenv.config();
 
@@ -67,6 +69,12 @@ async function start() {
     case Mode.missingId: {
       await loadSeriesWithMissingId(cli.get('type'));
       await updateIds(cli.get('type'), cli.has('save'));
+      break;
+    }
+
+    case Mode.missingData: {
+      await loadSeriesWithMissingData(cli.get('type'));
+      await updateData(cli.get('type'), cli.has('save'));
       break;
     }
 

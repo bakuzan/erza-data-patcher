@@ -74,7 +74,10 @@ module.exports = {
         format: ['camelCase'],
         leadingUnderscore: 'require'
       },
-
+      {
+        selector: 'property',
+        format: ['camelCase', 'snake_case']
+      },
       {
         selector: 'typeLike',
         format: ['PascalCase']
@@ -131,7 +134,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-member-access': ['warn'],
     'arrow-parens': ['off', 'always'],
     'brace-style': ['off', 'off'],
-    camelcase: 'error',
+    camelcase: 'off',
     'comma-dangle': 'off',
     complexity: 'off',
     'constructor-super': 'error',

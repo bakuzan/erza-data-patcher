@@ -1,10 +1,10 @@
-import { pathFix, readIn, writeFileAsync } from 'medea';
+import { pathFix, writeFileAsync } from 'medea';
 
 import { SeriesType } from '@/enums/SeriesType';
 import { SeriesStub } from '@/interfaces/SeriesStub';
-import { log, reportError } from '@/utils/log';
+import { log } from '@/utils/log';
 import { initDbInstance } from '@/utils/db';
-import { parseOfflineDataJson } from '@/utils/jsonParse';
+import getOfflineDb from '@/utils/getOfflineDb';
 
 const sqlQuery = new Map([
   [SeriesType.anime, `SELECT id, title, malId FROM animes WHERE malId IS NULL`],
@@ -27,20 +27,11 @@ export default async function loadSeriesWithMissingId(type: SeriesType) {
     process.exit(0);
   }
 
-  const dbFilename = pathFix(__dirname, '../cache/offline-database.json');
-  const result = await readIn(dbFilename);
-
-  if (!result.success) {
-    reportError(result.error);
-    process.exit(1);
-  }
-
+  const offItems = await getOfflineDb();
   const db = await initDbInstance();
   const rows = await db.all<SeriesStub[]>(queryString);
 
   log(`Found ${rows.length} series without malId.`);
-
-  const { data: offItems } = parseOfflineDataJson(result.data);
 
   for (const row of rows) {
     const source = offItems

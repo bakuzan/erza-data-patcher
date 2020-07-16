@@ -1,7 +1,8 @@
 import { OfflineData } from '@/interfaces/OfflineData';
 import { SeriesStub } from '@/interfaces/SeriesStub';
 
-import { isSeriesStub } from './guards';
+import { isSeriesStub, isSeriesWithMissingData } from './guards';
+import { SeriesWithMissingData } from '@/interfaces/SeriesWithMissingData';
 
 const safeJsonParse = <T>(guard: (o: any) => o is T) => (text: string): T => {
   const parsed = JSON.parse(text);
@@ -15,6 +16,13 @@ const safeJsonParse = <T>(guard: (o: any) => o is T) => (text: string): T => {
 
 export const parseSeriesStubJson = safeJsonParse<SeriesStub[]>(
   (j): j is SeriesStub[] => j instanceof Array && j.every(isSeriesStub)
+);
+
+export const parseSeriesWithMissingDataJson = safeJsonParse<
+  SeriesWithMissingData[]
+>(
+  (j): j is SeriesWithMissingData[] =>
+    j instanceof Array && j.every(isSeriesWithMissingData)
 );
 
 type OfflineDataJson = { data: OfflineData[] };
