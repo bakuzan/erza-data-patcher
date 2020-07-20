@@ -23,7 +23,7 @@ export default async function updateIds(type: SeriesType, isRealRun: boolean) {
     process.exit(0);
   }
 
-  const dbFilename = pathFix(__dirname, '../output', `missingIds_${type}.json`);
+  const dbFilename = pathFix(__dirname, `../output/missingIds_${type}.json`);
   const result = await readIn(dbFilename);
 
   if (!result.success) {

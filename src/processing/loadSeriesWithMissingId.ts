@@ -15,7 +15,7 @@ export default async function loadSeriesWithMissingId(type: SeriesType) {
   if (type === SeriesType.manga) {
     log(
       'No offline database exists for manga.',
-      'Will need to figure out a way to source the mal ids.'
+      '\r\nI Will need to figure out a way to source the mal ids.'
     );
 
     process.exit(0);

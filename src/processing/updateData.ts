@@ -1,4 +1,6 @@
-import { pathFix, readIn, typedKeys, prop } from 'medea';
+import { pathFix, readIn, typedKeys, prop, writeFileAsync } from 'medea';
+
+import processImage from './processImage';
 
 import { SeriesType } from '@/enums/SeriesType';
 import { reportError, log } from '@/utils/log';
@@ -23,11 +25,7 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
     process.exit(0);
   }
 
-  const dbFilename = pathFix(
-    __dirname,
-    '../output',
-    `missingData_${type}.json`
-  );
+  const dbFilename = pathFix(__dirname, `../output/missingData_${type}.json`);
   const result = await readIn(dbFilename);
 
   if (!result.success) {
@@ -47,7 +45,14 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
     };
 
     if (isRealRun) {
+      const image = await processImage(item.image);
+      replacements.$image = image;
+
       await db.run(updateQueryString, replacements);
+
+      // Update the source file as process will stop when imgur rate limit hit (~50 items)
+      const index = items.findIndex((x) => x.id === item.id);
+      await writeFileAsync(dbFilename, JSON.stringify(items.slice(index + 1)));
     } else {
       const dryRunMessage = typedKeys(replacements).reduce(
         (p, k) => p.replace(k, `${prop(replacements, k)}`),
