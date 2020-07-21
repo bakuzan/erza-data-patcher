@@ -13,6 +13,8 @@ const sqlQuery = new Map([
 
 export default async function loadSeriesWithMissingId(type: SeriesType) {
   if (type === SeriesType.manga) {
+    // TODO
+    // Find a way to source manga malIds
     log(
       'No offline database exists for manga.',
       '\r\nI Will need to figure out a way to source the mal ids.'

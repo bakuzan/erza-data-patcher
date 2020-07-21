@@ -45,7 +45,11 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
     };
 
     if (isRealRun) {
-      const image = await processImage(item.image);
+      const image = await processImage(
+        item.image,
+        async () => await db.close()
+      );
+
       replacements.$image = image;
 
       await db.run(updateQueryString, replacements);
