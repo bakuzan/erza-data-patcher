@@ -27,7 +27,9 @@ async function findAnimeMissingData(rows: SeriesWithMissingData[]) {
     const entry = offItems.find((x) =>
       x.sources.some(
         (s) =>
-          s.includes('myanimelist') && Number(s.split('/').pop()) === row.malId
+          s.includes('myanimelist') &&
+          row.malId !== null &&
+          Number(s.split('/').pop()) === row.malId
       )
     );
 
