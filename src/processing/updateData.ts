@@ -45,18 +45,19 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
     };
 
     if (isRealRun) {
-      const image = await processImage(
+      const $image = await processImage(
         item.image,
         async () => await db.close()
       );
 
-      replacements.$image = image;
-
-      await db.run(updateQueryString, replacements);
+      await db.run(updateQueryString, { ...replacements, $image });
 
       // Update the source file as process will stop when imgur rate limit hit (~50 items)
       const index = items.findIndex((x) => x.id === item.id);
       await writeFileAsync(dbFilename, JSON.stringify(items.slice(index + 1)));
+      log(
+        `Updated ${item.title} (Id: ${item.id}) (series_type: ${item.series_type}) (image: ${$image})`
+      );
     } else {
       const dryRunMessage = typedKeys(replacements).reduce(
         (p, k) => p.replace(k, `${prop(replacements, k)}`),

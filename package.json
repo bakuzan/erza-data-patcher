@@ -37,6 +37,7 @@
     "husky": "^4.2.5",
     "imgur": "^0.3.1",
     "lint-staged": "^10.2.11",
+    "mal-scraper": "^2.7.1",
     "medea": "file:../medea",
     "prettier": "^2.0.5",
     "sqlite": "^4.0.11",

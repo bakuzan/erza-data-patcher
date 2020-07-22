@@ -1,6 +1,7 @@
 import imgur from 'imgur';
 
 import { log, reportError } from '@/utils/log';
+import formatDate from '@/utils/formatDate';
 
 imgur.setCredentials(process.env.IMGUR_USERNAME, process.env.IMGUR_PASSWORD);
 
@@ -19,7 +20,7 @@ async function uploadImage(image: string, onExit: () => Promise<void>) {
 
       const d = new Date();
       d.setHours(d.getHours() + 1);
-      log(`Next upload @ ${d.toISOString()}`);
+      log(`Next upload @ ${formatDate(d)}`);
 
       await onExit();
       process.exit(0);
