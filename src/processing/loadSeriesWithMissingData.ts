@@ -1,4 +1,4 @@
-import { pathFix, writeFileAsync, readCachedFile } from 'medea';
+import { pathFix, writeFileAsync } from 'medea';
 
 import { SeriesType } from '@/enums/SeriesType';
 import { SeriesWithMissingData } from '@/interfaces/SeriesWithMissingData';
