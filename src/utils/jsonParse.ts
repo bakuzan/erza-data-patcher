@@ -3,6 +3,7 @@ import { SeriesStub } from '@/interfaces/SeriesStub';
 
 import { isSeriesStub, isSeriesWithMissingData } from './guards';
 import { SeriesWithMissingData } from '@/interfaces/SeriesWithMissingData';
+import { Tokens } from '@/interfaces/Tokens';
 
 const safeJsonParse = <T>(guard: (o: any) => o is T) => (text: string): T => {
   const parsed = JSON.parse(text);
@@ -32,4 +33,8 @@ export const parseOfflineDataJson = safeJsonParse<OfflineDataJson>(
     const key = 'data';
     return key in j && j[key] instanceof Array;
   }
+);
+
+export const parseTokens = safeJsonParse<Tokens>(
+  (j): j is Tokens => 'access_token' in j
 );

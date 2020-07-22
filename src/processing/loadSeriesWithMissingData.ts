@@ -5,6 +5,8 @@ import { SeriesWithMissingData } from '@/interfaces/SeriesWithMissingData';
 import { log } from '@/utils/log';
 import { initDbInstance } from '@/utils/db';
 import getOfflineDb from '@/utils/getOfflineDb';
+import { findMangaById } from '@/utils/malApi';
+import { capitalise } from '@/utils/captialise';
 
 const sqlQuery = new Map([
   [
@@ -62,31 +64,20 @@ async function findMangaMissingData(rows: SeriesWithMissingData[]) {
       continue;
     }
 
-    const $page = await readCachedFile(
-      `manga_${row.malId}`,
-      `https://myanimelist.net/manga/${row.malId}/`,
-      {
-        cacheDirectory: pathFix(__dirname, '../cache'),
-        cacheStaleTime: null
-      }
-    );
-
-    const image = $page('#content img.lazyloaded[itemprop]')?.attr('href');
-
-    const typeTag = Array.from($page('span.dark_text')).find(
-      (x) => $page(x).text() === 'Type:'
-    )?.nextSibling;
-
-    const seriesType = typeTag
-      ? $page(typeTag)?.text().trim() ?? 'Unknown'
-      : 'Unknown';
+    const entry = await findMangaById(row.malId);
+    const seriesType =
+      entry.media_type.length <= 3
+        ? entry.media_type.toUpperCase()
+        : capitalise(entry.media_type.replace(/-_/g, ''));
 
     const isDifferentType = seriesType !== row.series_type;
     const isNotImgurImage = !row.image || !row.image.includes('imgur');
     const needsUpdating = isDifferentType || isNotImgurImage;
 
     if (needsUpdating) {
-      const resolvedImage = isNotImgurImage ? image ?? '' : row.image;
+      const resolvedImage = isNotImgurImage
+        ? entry.main_picture.medium ?? ''
+        : row.image;
 
       withNewData.push({
         ...row,

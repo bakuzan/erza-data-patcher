@@ -1,11 +1,11 @@
-import { search as malScraper } from 'mal-scraper';
 import { pathFix, writeFileAsync } from 'medea';
 
 import { SeriesType } from '@/enums/SeriesType';
 import { SeriesStub } from '@/interfaces/SeriesStub';
 import { log } from '@/utils/log';
-import { initDbInstance } from '@/utils/db';
 import getOfflineDb from '@/utils/getOfflineDb';
+import { initDbInstance } from '@/utils/db';
+import { searchManga } from '@/utils/malApi';
 
 const sqlQuery = new Map([
   [SeriesType.anime, `SELECT id, title, malId FROM animes WHERE malId IS NULL`],
@@ -32,21 +32,22 @@ async function findAnimeMalIds(rows: SeriesStub[]) {
 async function findMangaMalIds(rows: SeriesStub[]) {
   for (const row of rows) {
     try {
-      const response = await malScraper.search('manga', {
-        maxResults: 1,
-        term: row.title.trim()
-      });
+      const response = await searchManga(row.title.trim());
+      const source = response.find(
+        (x) =>
+          x.title === row.title ||
+          x.alternative_titles.synonyms.includes(row.title) ||
+          x.alternative_titles.en === row.title
+      );
 
-      const source = response.pop();
-
-      if (!source || source.title !== row.title) {
+      if (!source) {
         continue;
       }
 
-      row.malId = Number(source.url.split('/').pop());
+      row.malId = Number(source.id);
       log(`${row.title} (Id: ${row.id}), found malId: ${row.malId}`);
     } catch (e) {
-      log(`Bad response from ${row.title}, will be ignored.`);
+      log(`Bad response from ${row.title}, will be ignored.`, e.message);
     }
   }
 }
@@ -66,7 +67,7 @@ export default async function loadSeriesWithMissingId(type: SeriesType) {
   if (type === SeriesType.anime) {
     await findAnimeMalIds(rows);
   } else if (type === SeriesType.manga) {
-    await findMangaMalIds(rows); // TODO find out why this doesnt find any malIds
+    await findMangaMalIds(rows);
   }
 
   // Only write out items that have found ids
