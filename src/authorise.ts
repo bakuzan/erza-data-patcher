@@ -1,11 +1,10 @@
+import './config';
+
 import express from 'express';
 import API from '@chris-kode/myanimelist-api-v2';
 import pkceChallenge from 'pkce-challenge';
-import dotenv from 'dotenv';
 
 import { writeFileAsync, pathFix } from 'medea';
-
-dotenv.config();
 
 const port = 3000;
 const app = express();

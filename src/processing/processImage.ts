@@ -5,6 +5,12 @@ import formatDate from '@/utils/formatDate';
 
 imgur.setCredentials(process.env.IMGUR_USERNAME, process.env.IMGUR_PASSWORD);
 
+if (process.env.IMGUR_CLIENT_SECRET) {
+  imgur.setClientId(process.env.IMGUR_CLIENT_SECRET);
+} else {
+  log('No imgur client secret set.');
+}
+
 async function uploadImage(image: string, onExit: () => Promise<void>) {
   try {
     log(`Uploading ${image}`);
@@ -44,6 +50,6 @@ export default async function processImage(
     return response.url;
   } else {
     reportError(`Bad imgur upload of: ${image}`, response.error);
-    return '';
+    process.exit(0);
   }
 }

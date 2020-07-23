@@ -7,6 +7,7 @@ declare module 'imgur' {
 
   class Imgur {
     setCredentials(username?: string, password?: string): void;
+    setClientId(clientId: string): void;
     uploadUrl(imageUrl: string, albumId?: string): Promise<ImgurResponse>;
   }
 

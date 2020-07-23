@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import './config';
 
 import { createClient, validate } from 'medea';
 import { Mode } from '@/enums/Mode';
@@ -9,8 +9,6 @@ import loadSeriesWithMissingId from './processing/loadSeriesWithMissingId';
 import loadSeriesWithMissingData from './processing/loadSeriesWithMissingData';
 import updateIds from './processing/updateIds';
 import updateData from './processing/updateData';
-
-dotenv.config();
 
 const modeOptions = Object.keys(Mode).reduce((p, k, i, a) => {
   const sep = i + 1 === a.length ? ' or ' : ' ';
