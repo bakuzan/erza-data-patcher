@@ -56,7 +56,7 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
       const index = items.findIndex((x) => x.id === item.id);
       await writeFileAsync(dbFilename, JSON.stringify(items.slice(index + 1)));
       log(
-        `Updated ${item.title} (Id: ${item.id}) (series_type: ${item.series_type}) (image: ${$image})`
+        `Updated ${item.title}\r\n(Id: ${item.id}, series_type: ${item.series_type})`
       );
     } else {
       const dryRunMessage = typedKeys(replacements).reduce(
