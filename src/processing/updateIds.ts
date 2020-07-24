@@ -45,7 +45,9 @@ export default async function updateIds(type: SeriesType, isRealRun: boolean) {
       await db.run(updateQueryString, replacements);
 
       log(
-        `Updated ${item.title} (Id: ${item.id}) to have malId: ${item.malId}`
+        `Updated ${item.title}`,
+        `\r\n(Id: ${item.id}) to have malId: ${item.malId}`,
+        `\r\n`
       );
     } else {
       const dryRunMessage = typedKeys(replacements).reduce(
@@ -53,7 +55,7 @@ export default async function updateIds(type: SeriesType, isRealRun: boolean) {
         updateQueryString
       );
 
-      log('Potential Update: ', dryRunMessage);
+      log(`\r\nPotential Update ${item.title}`, `\r\n${dryRunMessage}`);
     }
   }
 

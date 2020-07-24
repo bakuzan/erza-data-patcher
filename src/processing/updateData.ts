@@ -56,7 +56,9 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
       const index = items.findIndex((x) => x.id === item.id);
       await writeFileAsync(dbFilename, JSON.stringify(items.slice(index + 1)));
       log(
-        `Updated ${item.title}\r\n(Id: ${item.id}, series_type: ${item.series_type})`
+        `Updated ${item.title}`,
+        `\r\n(Id: ${item.id}, series_type: ${item.series_type})`,
+        `\r\n`
       );
     } else {
       const dryRunMessage = typedKeys(replacements).reduce(
@@ -64,12 +66,12 @@ export default async function updateData(type: SeriesType, isRealRun: boolean) {
         updateQueryString
       );
 
-      log('Potential Update: ', dryRunMessage);
+      log(`\r\nPotential Update ${item.title}`, `\r\n${dryRunMessage}`);
     }
   }
 
   log(
-    `${items.length} updates processed.`,
+    `\r\n${items.length} updates processed.`,
     isRealRun
       ? ''
       : '\r\nTo Persist changes to the database pass --save when running the command.'
