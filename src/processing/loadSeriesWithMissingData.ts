@@ -1,4 +1,4 @@
-import { pathFix, writeFileAsync } from 'medea';
+import { pathFix, writeFileAsync, readIn, confirmation } from 'medea';
 
 import { SeriesType } from '@/enums/SeriesType';
 import { SeriesWithMissingData } from '@/interfaces/SeriesWithMissingData';
@@ -7,17 +7,18 @@ import { initDbInstance } from '@/utils/db';
 import getOfflineDb from '@/utils/getOfflineDb';
 import { findMangaById } from '@/utils/malApi';
 import { capitalise } from '@/utils/captialise';
+import { parseSeriesWithMissingDataJson } from '@/utils/jsonParse';
 
 const sqlQuery = new Map([
   [
     SeriesType.anime,
     `SELECT id, title, malId, image, series_type FROM animes 
-     WHERE series_type = 'Unknown' OR image = '' OR image NOT LIKE '%imgur%'`
+     WHERE malId IS NOT NULL AND (series_type = 'Unknown' OR image = '' OR image NOT LIKE '%imgur%')`
   ],
   [
     SeriesType.manga,
     `SELECT id, title, malId, image, series_type FROM mangas 
-     WHERE series_type = 'Unknown' OR image = '' OR image NOT LIKE '%imgur%'`
+     WHERE malId IS NOT NULL AND (series_type = 'Unknown' OR image = '' OR image NOT LIKE '%imgur%')`
   ]
 ]);
 
@@ -56,7 +57,26 @@ async function findAnimeMissingData(rows: SeriesWithMissingData[]) {
 }
 
 async function findMangaMissingData(rows: SeriesWithMissingData[]) {
-  const withNewData: SeriesWithMissingData[] = [];
+  let withNewData: SeriesWithMissingData[] = [];
+
+  const filename = pathFix(__dirname, '../output', `missingData_manga.json`);
+  const result = await readIn(filename);
+
+  if (result.success) {
+    const shouldUseExisting = await confirmation(
+      'Found existing missing data file. Should this be reused?'
+    );
+
+    if (shouldUseExisting) {
+      const data = (result.data ?? '[]') as string;
+      withNewData = parseSeriesWithMissingDataJson(data);
+      return withNewData;
+    } else {
+      log(`Sourcing new data, overwriting existing file...`);
+    }
+  } else {
+    log(`No existing missing data file, sourcing new data...`);
+  }
 
   for (const row of rows) {
     if (row.malId === null) {
@@ -65,10 +85,14 @@ async function findMangaMissingData(rows: SeriesWithMissingData[]) {
     }
 
     const entry = await findMangaById(row.malId);
+    if (entry === null) {
+      continue;
+    }
+
     const seriesType =
       entry.media_type.length <= 3
         ? entry.media_type.toUpperCase()
-        : capitalise(entry.media_type.replace(/-_/g, ''));
+        : capitalise(entry.media_type.replace(/-|_/g, ''));
 
     const isDifferentType = seriesType !== row.series_type;
     const isNotImgurImage = !row.image || !row.image.includes('imgur');

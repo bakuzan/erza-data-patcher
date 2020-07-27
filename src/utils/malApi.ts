@@ -1,7 +1,7 @@
 import API from '@chris-kode/myanimelist-api-v2';
 
 import { readIn, pathFix, writeFileAsync } from 'medea';
-import { reportError } from './log';
+import { reportError, log } from './log';
 import { parseTokens } from './jsonParse';
 import { Tokens } from '@/interfaces/Tokens';
 
@@ -33,15 +33,20 @@ async function refreshTokens(refreshToken: string) {
     process.exit(0);
   }
 
-  const oauth = new API.OAUTH(CLIENT_ID);
-  const response = await oauth.refreshToken(refreshToken);
+  try {
+    const oauth = new API.OAUTH(CLIENT_ID);
+    const response = await oauth.refreshToken(refreshToken);
 
-  await writeFileAsync(
-    pathFix(__dirname, '../output/tokens.json'),
-    JSON.stringify(response)
-  );
+    await writeFileAsync(
+      pathFix(__dirname, '../output/tokens.json'),
+      JSON.stringify(response)
+    );
 
-  return await getTokens();
+    return await getTokens();
+  } catch (e) {
+    reportError(`Failed to refresh token`, e.message);
+    process.exit(0);
+  }
 }
 
 async function getMangaApi(
@@ -52,7 +57,7 @@ async function getMangaApi(
     return new API.API_MANGA(tokens.access_token);
   } catch (e) {
     if (!canRefresh) {
-      reportError(`Failed to refresh token.`, e.message);
+      reportError(`Failed to getMangaApi.`, e.message);
       process.exit(0);
     }
 
@@ -71,5 +76,12 @@ export async function searchManga(term: string) {
 export async function findMangaById(malId: number) {
   const data = await getTokens();
   const manga = await getMangaApi(data);
-  return await manga.manga(malId, defaultFields);
+
+  try {
+    log(`Requesting MalId: ${malId}`);
+    return await manga.manga(malId, defaultFields);
+  } catch (e) {
+    reportError(`Request failed for ${malId}`, e);
+    return null;
+  }
 }
