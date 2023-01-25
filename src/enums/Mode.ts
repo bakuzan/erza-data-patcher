@@ -1,4 +1,5 @@
 export enum Mode {
   missingId = 'missingId',
-  missingData = 'missingData'
+  missingData = 'missingData',
+  relations = 'relations'
 }

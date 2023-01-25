@@ -7,8 +7,10 @@ import { log } from '@/utils/log';
 
 import loadSeriesWithMissingId from './processing/loadSeriesWithMissingId';
 import loadSeriesWithMissingData from './processing/loadSeriesWithMissingData';
+import loadSeriesWithMissingRelations from './processing/loadSeriesWithMissingRelations';
 import updateIds from './processing/updateIds';
 import updateData from './processing/updateData';
+import updateRelations from './processing/updateRelations';
 
 const modeOptions = Object.keys(Mode).reduce((p, k, i, a) => {
   const sep = i + 1 === a.length ? ' or ' : ' ';
@@ -76,6 +78,12 @@ async function start() {
       break;
     }
 
+    case Mode.relations: {
+      await loadSeriesWithMissingRelations(cli.get('type'));
+      await updateRelations(cli.get('type'), cli.has('save'));
+      break;
+    }
+
     default:
       log(`Mode case '${cli.get('mode')}' is not handled.`);
       break;
@@ -84,4 +92,5 @@ async function start() {
   process.exit(0);
 }
 
+console.log('STARTINGS');
 void start();

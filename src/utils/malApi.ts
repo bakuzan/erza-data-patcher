@@ -11,7 +11,9 @@ const defaultFields = [
   'main_picture',
   'alternative_titles',
   'media_type',
-  'source'
+  'source',
+  'related_anime',
+  'related_manga'
 ];
 
 async function getTokens(): Promise<Tokens> {
@@ -44,7 +46,7 @@ async function refreshTokens(refreshToken: string) {
 
     return await getTokens();
   } catch (e) {
-    reportError(`Failed to refresh token`, e.message);
+    reportError(`Failed to refresh token`, (e as Error).message);
     process.exit(0);
   }
 }
@@ -57,7 +59,7 @@ async function getMangaApi(
     return new API.API_MANGA(tokens.access_token);
   } catch (e) {
     if (!canRefresh) {
-      reportError(`Failed to getMangaApi.`, e.message);
+      reportError(`Failed to getMangaApi.`, (e as Error).message);
       process.exit(0);
     }
 
@@ -80,6 +82,19 @@ export async function findMangaById(malId: number) {
   try {
     log(`Requesting MalId: ${malId}`);
     return await manga.manga(malId, defaultFields);
+  } catch (e) {
+    reportError(`Request failed for ${malId}`, e);
+    return null;
+  }
+}
+
+export async function findAnimeById(malId: number) {
+  const data = await getTokens();
+  const manga = await getMangaApi(data);
+
+  try {
+    log(`Requesting MalId: ${malId}`);
+    return await manga.anime(malId, defaultFields);
   } catch (e) {
     reportError(`Request failed for ${malId}`, e);
     return null;

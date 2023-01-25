@@ -47,7 +47,10 @@ async function findMangaMalIds(rows: SeriesStub[]) {
       row.malId = Number(source.id);
       log(`${row.title} (Id: ${row.id}), found malId: ${row.malId}`);
     } catch (e) {
-      log(`Bad response from ${row.title}, will be ignored.`, e.message);
+      log(
+        `Bad response from ${row.title}, will be ignored.`,
+        (e as Error).message
+      );
     }
   }
 }

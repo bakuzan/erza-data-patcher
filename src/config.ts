@@ -4,6 +4,7 @@ import { log } from './utils/log';
 const result = dotenv.config();
 
 if (result.error) {
+  log(`Failed to load config: `, result.error);
   process.exit(0);
 }
 

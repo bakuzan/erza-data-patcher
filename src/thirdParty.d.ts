@@ -32,12 +32,15 @@ declare module '@chris-kode/myanimelist-api-v2' {
 
   interface MangaApi {
     new (token: string): MangaApi;
+    /* Search */
     mangas(
       term: string,
       offset?: number,
       limit?: number,
       fields?: string[]
     ): Promise<{ data: MalNode[] }>;
+    /* By Id */
+    anime(malId: number, fields?: string[]): Promise<MalDbEntry>;
     manga(malId: number, fields?: string[]): Promise<MalDbEntry>;
   }
 

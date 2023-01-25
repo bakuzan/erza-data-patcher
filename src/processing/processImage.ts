@@ -20,7 +20,7 @@ async function uploadImage(image: string, onExit: () => Promise<void>) {
       success: true,
       url: response.data.link
     };
-  } catch (e) {
+  } catch (e: any) {
     if (e.message.code === 429) {
       reportError(`Imgur rate limit hit!!`, e.message.message);
 
