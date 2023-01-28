@@ -1,26 +1,36 @@
-import imgur from 'imgur';
+import { ImgurClient } from 'imgur';
+
+import { ImgurErrorResponse } from '@/interfaces/ImgurErrorResponse';
 
 import { log, reportError } from '@/utils/log';
 import formatDate from '@/utils/formatDate';
 
-imgur.setCredentials(process.env.IMGUR_USERNAME, process.env.IMGUR_PASSWORD);
+const imgur = new ImgurClient({
+  clientId: process.env.IMGUR_CLIENT_SECRET
+});
 
-if (process.env.IMGUR_CLIENT_SECRET) {
-  imgur.setClientId(process.env.IMGUR_CLIENT_SECRET);
-} else {
+// imgur.setCredentials(process.env.IMGUR_USERNAME, process.env.IMGUR_PASSWORD);
+
+if (!process.env.IMGUR_CLIENT_SECRET) {
   log('No imgur client secret set.');
 }
 
 async function uploadImage(image: string, onExit: () => Promise<void>) {
   try {
     log(`Uploading ${image}`);
-    const response = await imgur.uploadUrl(image, process.env.IMGUR_ALBUM);
+    const response = await imgur.upload({
+      album: process.env.IMGUR_ALBUM,
+      type: 'url',
+      image
+    });
 
     return {
       success: true,
       url: response.data.link
     };
-  } catch (e: any) {
+  } catch (error: unknown) {
+    const e = error as ImgurErrorResponse;
+
     if (e.message.code === 429) {
       reportError(`Imgur rate limit hit!!`, e.message.message);
 

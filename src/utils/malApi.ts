@@ -5,6 +5,8 @@ import { reportError, log } from './log';
 import { parseTokens } from './jsonParse';
 import { Tokens } from '@/interfaces/Tokens';
 
+const waitForATime = () => new Promise((resolve) => setTimeout(resolve, 300));
+
 const defaultFields = [
   'id',
   'title',
@@ -50,6 +52,22 @@ async function refreshTokens(refreshToken: string) {
     process.exit(0);
   }
 }
+async function getAnimeApi(
+  tokens: Tokens,
+  canRefresh = true
+): Promise<typeof API.API_ANIME> {
+  try {
+    return new API.API_ANIME(tokens.access_token);
+  } catch (e) {
+    if (!canRefresh) {
+      reportError(`Failed to getAnimeApi.`, (e as Error).message);
+      process.exit(0);
+    }
+
+    const data = await refreshTokens(tokens.refresh_token);
+    return await getAnimeApi(data, false);
+  }
+}
 
 async function getMangaApi(
   tokens: Tokens,
@@ -80,6 +98,7 @@ export async function findMangaById(malId: number) {
   const manga = await getMangaApi(data);
 
   try {
+    await waitForATime();
     log(`Requesting MalId: ${malId}`);
     return await manga.manga(malId, defaultFields);
   } catch (e) {
@@ -90,11 +109,12 @@ export async function findMangaById(malId: number) {
 
 export async function findAnimeById(malId: number) {
   const data = await getTokens();
-  const manga = await getMangaApi(data);
+  const anime = await getAnimeApi(data);
 
   try {
+    await waitForATime();
     log(`Requesting MalId: ${malId}`);
-    return await manga.anime(malId, defaultFields);
+    return await anime.anime(malId, defaultFields);
   } catch (e) {
     reportError(`Request failed for ${malId}`, e);
     return null;

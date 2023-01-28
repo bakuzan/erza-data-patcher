@@ -1,3 +1,4 @@
+import { existsSync } from 'fs';
 import sqlite3 from 'sqlite3';
 import { Database } from 'sqlite';
 
@@ -9,6 +10,12 @@ import {
   SeriesRelation,
   SeriesStub
 } from '@/interfaces/SeriesStub';
+import {
+  AnimeAnimeRelation,
+  AnimeMangaRelation,
+  MangaMangaRelation
+} from '@/interfaces/Relations';
+
 import { log } from '@/utils/log';
 
 import { initDbInstance } from '@/utils/db';
@@ -25,12 +32,18 @@ async function findAnimeMalRelations(
 ) {
   for (const row of rows) {
     try {
+      if (!row.malId) {
+        log(`MalId is null for ${row.title}`);
+        continue;
+      }
+
       const source = await findAnimeById(row.malId);
 
       if (!source) {
         continue;
       }
 
+      log(`MalItem: `, source);
       const missingRelations: SeriesRelation[] = [];
       const seriesRelations = [
         ...source.related_anime.map((x) => ({
@@ -43,12 +56,12 @@ async function findAnimeMalRelations(
         }))
       ];
 
-      const animeRelations = await db.all(
+      const animeRelations: AnimeAnimeRelation[] = await db.all(
         `SELECT * 
          FROM AnimeAnimeRelation 
         WHERE animeId1 = ${row.id}`
       );
-      const mangaRelations = await db.all(
+      const mangaRelations: AnimeMangaRelation[] = await db.all(
         `SELECT * 
          FROM AnimeMangaRelation 
         WHERE animeId = ${row.id}`
@@ -112,12 +125,18 @@ async function findMangaMalRelations(
 ) {
   for (const row of rows) {
     try {
+      if (!row.malId) {
+        log(`MalId is null for ${row.title}`);
+        continue;
+      }
+
       const source = await findMangaById(row.malId);
 
       if (!source) {
         continue;
       }
 
+      log(`MalItem: `, source);
       const missingRelations: SeriesRelation[] = [];
       const seriesRelations = [
         ...source.related_anime.map((x) => ({
@@ -130,12 +149,12 @@ async function findMangaMalRelations(
         }))
       ];
 
-      const mangaRelations = await db.all(
+      const mangaRelations: MangaMangaRelation[] = await db.all(
         `SELECT * 
              FROM MangaMangaRelation 
             WHERE mangaId1 = ${row.id}`
       );
-      const animeRelations = await db.all(
+      const animeRelations: AnimeMangaRelation[] = await db.all(
         `SELECT * 
              FROM AnimeMangaRelation 
             WHERE mangaId = ${row.id}`
@@ -200,6 +219,17 @@ export default async function loadSeriesWithMissingRelations(type: SeriesType) {
     process.exit(0);
   }
 
+  const missingRelationsFilePath = pathFix(
+    __dirname,
+    '../output',
+    `missingRelations_${type}.json`
+  );
+
+  if (existsSync(missingRelationsFilePath)) {
+    log(`Missing relations for ${type} already exists. Skipping processing...`);
+    return;
+  }
+
   const db = await initDbInstance();
   const rows = await db.all<SeriesWithRelationsStub[]>(queryString);
 
@@ -221,7 +251,7 @@ export default async function loadSeriesWithMissingRelations(type: SeriesType) {
   );
 
   await writeFileAsync(
-    pathFix(__dirname, '../output', `missingRelations_${type}.json`),
+    missingRelationsFilePath,
     JSON.stringify(withFoundRelations)
   );
 

@@ -1,21 +1,5 @@
 /* eslint-disable */
 
-declare module 'imgur' {
-  interface ImgurResponse {
-    data: { link: string };
-  }
-
-  class Imgur {
-    setCredentials(username?: string, password?: string): void;
-    setClientId(clientId: string): void;
-    uploadUrl(imageUrl: string, albumId?: string): Promise<ImgurResponse>;
-  }
-
-  const img: Imgur;
-
-  export = img;
-}
-
 declare module '@chris-kode/myanimelist-api-v2' {
   import { MalDbEntry } from '@/interfaces/MalDbEntry';
 
@@ -29,6 +13,12 @@ declare module '@chris-kode/myanimelist-api-v2' {
     accessToken(code: string, challenge: string): Promise<string>;
     refreshToken(refreshToken: string): Promise<string>;
   }
+  interface AnimeApi {
+    new (token: string): AnimeApi;
+
+    /* By Id */
+    anime(malId: number, fields?: string[]): Promise<MalDbEntry>;
+  }
 
   interface MangaApi {
     new (token: string): MangaApi;
@@ -40,13 +30,13 @@ declare module '@chris-kode/myanimelist-api-v2' {
       fields?: string[]
     ): Promise<{ data: MalNode[] }>;
     /* By Id */
-    anime(malId: number, fields?: string[]): Promise<MalDbEntry>;
     manga(malId: number, fields?: string[]): Promise<MalDbEntry>;
   }
 
   interface MalApi {
     OAUTH: AuthApi;
     API_MANGA: MangaApi;
+    API_ANIME: AnimeApi;
   }
 
   const API: MalApi;

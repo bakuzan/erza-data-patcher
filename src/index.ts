@@ -65,22 +65,25 @@ async function start() {
     () => log(`Invalid type supplied. Expected: 'anime' or 'manga'.`)
   );
 
+  // Get variables...
+  const seriesType = cli.get('type') as SeriesType;
+
   switch (cli.get('mode')) {
     case Mode.missingId: {
-      await loadSeriesWithMissingId(cli.get('type'));
-      await updateIds(cli.get('type'), cli.has('save'));
+      await loadSeriesWithMissingId(seriesType);
+      await updateIds(seriesType, cli.has('save'));
       break;
     }
 
     case Mode.missingData: {
-      await loadSeriesWithMissingData(cli.get('type'));
-      await updateData(cli.get('type'), cli.has('save'));
+      await loadSeriesWithMissingData(seriesType);
+      await updateData(seriesType, cli.has('save'));
       break;
     }
 
     case Mode.relations: {
-      await loadSeriesWithMissingRelations(cli.get('type'));
-      await updateRelations(cli.get('type'), cli.has('save'));
+      await loadSeriesWithMissingRelations(seriesType);
+      await updateRelations(seriesType, cli.has('save'));
       break;
     }
 
@@ -92,5 +95,5 @@ async function start() {
   process.exit(0);
 }
 
-console.log('STARTINGS');
+log('STARTING...');
 void start();
