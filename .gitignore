@@ -3,7 +3,7 @@ node_modules
 
 # Files
 .env
-*.sqlite
+*.sqlite*
 
 # Temp files
 **/cache/*.html

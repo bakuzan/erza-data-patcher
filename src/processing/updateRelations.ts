@@ -46,10 +46,18 @@ export default async function updateRelations(
   const db = await initDbInstance();
   const data = (result.data ?? '[]') as string;
   const items = parseSeriesWithRelationsStubJson(data);
-  const relations = items.reduce(
-    (p, c) => [...p, ...(c.relations ?? [])],
-    [] as SeriesRelation[]
-  );
+  const relations = items
+    .reduce((p, c) => [...p, ...(c.relations ?? [])], [] as SeriesRelation[])
+    .filter(
+      (x, i, a) =>
+        a.findIndex(
+          (y) =>
+            x.type === y.type &&
+            x.rowId === y.rowId &&
+            x.otherType === y.otherType &&
+            x.otherId === y.otherId
+        ) === i
+    );
 
   for (const item of relations) {
     const isMatchingType = item.type === item.otherType;
